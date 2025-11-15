@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hourly Motivation (London Time)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s ease;
+        }
+        /* Custom background gradient for visual appeal (This class is immediately replaced by JS) */
+        .motivation-gradient {
+            background-image: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen motivation-gradient p-4">
+
+    <!-- Motivation Card -->
+    <div id="motivation-card" class="bg-white/90 backdrop-blur-sm p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-xl text-center transition-all duration-500 transform scale-100 hover:scale-[1.02]">
+        
+        <h1 id="time-display" class="text-indigo-600 text-6xl md:text-8xl font-extrabold mb-4 transition-colors duration-500">
+            00:00:00
+        </h1>
+        <p class="text-indigo-500 text-sm md:text-base font-medium uppercase tracking-widest mb-6">
+            It's the start of your new hour.
+        </p>
+        <blockquote class="text-3xl md:text-4xl font-light text-gray-800 italic leading-snug">
+            <span id="quote-text">Loading inspiration...</span>
+        </blockquote>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Use a self-contained array of 24 objects (one for each hour, 0-23)
+        const hourlyMessages = [
+            // Hour 0 (00:00 - 00:59) - Midnight
+            { hour: 0, time: "12:00 AM", message: "Deep rest is essential. Let go of the day and embrace the silence. Your energy bank is refueling.", color: "red" },
+            // Hour 1 (01:00)
+            { hour: 1, time: "1:00 AM", message: "Trust the night. Great ideas are often born in quiet contemplation, even in your dreams.", color: "red" },
+            // Hour 2 (02:00)
+            { hour: 2, time: "2:00 AM", message: "The world is on pause. This is the moment for healing and preparation for the rising sun.", color: "red" },
+            // Hour 3 (03:00)
+            { hour: 3, time: "3:00 AM", message: "Dream big. The canvas of your future is painted when the present moment is still.", color: "red" },
+            // Hour 4 (04:00)
+            { hour: 4, time: "4:00 AM", message: "The early hours hold silent potential. Even if you're asleep, your mind is processing success.", color: "orange" },
+            // Hour 5 (05:00)
+            { hour: 5, time: "5:00 AM", message: "Quiet preparation is the foundation of brilliant days. Plan your three main victories now.", color: "orange" },
+            // Hour 6 (06:00)
+            { hour: 6, time: "6:00 AM", message: "Sunrise: A fresh start button. Set the intention to be productive, patient, and present.", color: "green" },
+            // Hour 7 (07:00)
+            { hour: 7, time: "7:00 AM", message: "Structure your morning routine. A disciplined start leads to a powerful day. Focus on one task.", color: "green" },
+            // Hour 8 (08:00)
+            { hour: 8, time: "8:00 AM", message: "Tackle the 'Frog.' Do your hardest, most important task first. Momentum starts here.", color: "blue" },
+            // Hour 9 (09:00)
+            { hour: 9, time: "9:00 AM", message: "Momentum built. Maintain the pace by taking a structured, 5-minute movement break.", color: "blue" },
+            // Hour 10 (10:00)
+            { hour: 10, time: "10:00 AM", message: "Mid-morning focus is crucial. Eliminate distractions and dive deep into complexity.", color: "blue" },
+            // Hour 11 (11:00)
+            { hour: 11, time: "11:00 AM", message: "Time for a quick progress check. Are you moving the needle? Re-align if needed.", color: "yellow" },
+            // Hour 12 (12:00 - 12:59) - Noon
+            { hour: 12, time: "12:00 PM", message: "Lunchtime recharge. Step away from your desk. Give your mind a complete, non-work break.", color: "yellow" },
+            // Hour 13 (13:00)
+            { hour: 13, time: "1:00 PM", message: "The afternoon surge begins. Hydrate, stretch, and attack your second priority with fresh eyes.", color: "purple" },
+            // Hour 14 (14:00)
+            { hour: 14, time: "2:00 PM", message: "Power through the slump. If motivation dips, switch to a task requiring low cognitive load.", color: "purple" },
+            // Hour 15 (15:00)
+            { hour: 15, time: "3:00 PM", message: "This is your peak productivity window for collaboration or quick wins. Delegate or decide swiftly.", color: "purple" },
+            // Hour 16 (16:00)
+            { hour: 16, time: "4:00 PM", message: "Wrap-up mode. Finalize commitments and capture loose ends. Clear the slate for tomorrow.", color: "cyan" },
+            // Hour 17 (17:00)
+            { hour: 17, time: "5:00 PM", message: "Transition time. Mentally check out from work. Focus on the value you created today, not what's left.", color: "cyan" },
+            // Hour 18 (18:00)
+            { hour: 18, time: "6:00 PM", message: "Celebrate small wins. Acknowledging progress fuels future success. Be kind to yourself.", color: "pink" },
+            // Hour 19 (19:00)
+            { hour: 19, time: "7:00 PM", message: "Invest in connection. Spend quality time with people you love, or engage in a rewarding hobby.", color: "pink" },
+            // Hour 20 (20:00)
+            { hour: 20, time: "8:00 PM", message: "Learn something new. Read a chapter, watch a documentary, or practice a skill. Grow every day.", color: "pink" },
+            // Hour 21 (21:00)
+            { hour: 21, time: "9:00 PM", message: "Reflect and write. What went well? What could be improved? Gratitude is key.", color: "gray" },
+            // Hour 22 (22:00)
+            { hour: 22, time: "10:00 PM", message: "Wind down routine. Dim the lights, put the phone away. Prepare your body for restorative sleep.", color: "gray" },
+            // Hour 23 (23:00)
+            { hour: 23, time: "11:00 PM", message: "The day is done. Sleep is the most productive thing you can do now. Good night.", color: "gray" }
+        ];
+
+        const quoteText = document.getElementById('quote-text');
+        const timeDisplay = document.getElementById('time-display');
+        const motivationCard = document.getElementById('motivation-card');
+        const body = document.body;
+        
+        // State to track the last hour displayed (initial value -1 ensures it updates immediately on load)
+        let lastLondonHour = -1; 
+        const timeZone = "Europe/London";
+
+        /**
+         * Updates the motivation message, clock display, and schedules the next update.
+         */
+        function updateMotivation() {
+            const now = new Date();
+
+            // 1. Calculate current London hour (0-23) using Intl.DateTimeFormat
+            // This MUST stay in 24-hour format to correctly index the hourlyMessages array.
+            const currentHour = parseInt(now.toLocaleString("en-US", { 
+                timeZone: timeZone, 
+                hour: "numeric", 
+                hour12: false 
+            }), 10);
+
+            // 2. Calculate display time in 12-hour format (e.g., "3:52:30 PM")
+            const timeDisplayString = now.toLocaleTimeString('en-US', { 
+                timeZone: timeZone, 
+                hour: 'numeric', // Use 'numeric' for no leading zero on the hour (e.g., "3" not "03")
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: true 
+            }); 
+            
+            // Always update the time display (live clock)
+            timeDisplay.textContent = timeDisplayString;
+
+
+            // 3. Only update the motivational content and styling if the hour has changed
+            if (currentHour !== lastLondonHour) {
+                console.log(`Hour changed to ${currentHour} in London. Updating content.`);
+                lastLondonHour = currentHour;
+                
+                if (currentHour >= 0 && currentHour < hourlyMessages.length) {
+                    const data = hourlyMessages[currentHour];
+
+                    // Update text
+                    quoteText.textContent = data.message;
+                    
+                    // Apply dynamic styling based on the message's color/theme
+                    let gradientClass = 'from-indigo-400 to-purple-600'; // Default
+                    let timeColorClass = 'text-indigo-600';
+
+                    // Change the main background gradient based on time of day
+                    if (data.color === 'red') { // Deep Rest (Late Night)
+                        gradientClass = 'from-gray-900 to-gray-700';
+                        timeColorClass = 'text-red-400';
+                    } else if (data.color === 'orange') { // Preparation (Early Morning)
+                        gradientClass = 'from-amber-400 to-orange-500';
+                        timeColorClass = 'text-orange-700';
+                    } else if (data.color === 'green') { // Morning Focus
+                        gradientClass = 'from-emerald-400 to-green-600';
+                        timeColorClass = 'text-green-700';
+                    } else if (data.color === 'blue' || data.color === 'yellow') { // Midday/Lunch
+                        gradientClass = 'from-sky-400 to-blue-600';
+                        timeColorClass = 'text-blue-700';
+                    } else if (data.color === 'purple') { // Afternoon Power
+                        gradientClass = 'from-violet-500 to-fuchsia-600';
+                        timeColorClass = 'text-purple-700';
+                    } else if (data.color === 'cyan') { // Evening Transition
+                        gradientClass = 'from-cyan-500 to-teal-500';
+                        timeColorClass = 'text-cyan-700';
+                    } else if (data.color === 'pink') { // Social/Growth
+                        gradientClass = 'from-pink-400 to-rose-600';
+                        timeColorClass = 'text-pink-700';
+                    } else if (data.color === 'gray') { // Wind Down
+                        gradientClass = 'from-gray-500 to-gray-700';
+                        timeColorClass = 'text-gray-200'; // Light color for dark background
+                    }
+
+                    // Apply new gradient and time color, removing previous ones
+                    body.className = body.className.replace(/motivation-gradient|from-\w+-\d+ to-\w+-\d+/g, '').trim();
+                    
+                    // Use the spread operator on gradientClass.split(' ') to pass individual tokens 
+                    // to classList.add, resolving the InvalidCharacterError.
+                    body.classList.add('flex', 'items-center', 'justify-center', 'min-h-screen', 'p-4', 'bg-gradient-to-br', ...gradientClass.split(' '));
+
+                    timeDisplay.className = timeDisplay.className.replace(/text-\w+-\d+/g, '').trim();
+                    timeDisplay.classList.add(timeColorClass, 'text-6xl', 'md:text-8xl', 'font-extrabold', 'mb-4', 'transition-colors', 'duration-500');
+
+                } else {
+                    quoteText.textContent = "Error: Invalid London hour detected.";
+                }
+            }
+        }
+
+        // Initialize and start the application with a 1-second interval to keep the clock live 
+        // and ensure the content changes precisely when the London hour rolls over.
+        document.addEventListener('DOMContentLoaded', () => {
+            updateMotivation();
+            // Check every 1 second
+            setInterval(updateMotivation, 1000); 
+        });
+    </script>
+</body>
+</html>
