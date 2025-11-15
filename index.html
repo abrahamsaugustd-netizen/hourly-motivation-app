@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hourly Motivation (London Time)</title>
+    <title>30-Minute Motivation (London Time)</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.5s ease;
         }
         /* Custom background gradient for visual appeal (This class is immediately replaced by JS) */
         .motivation-gradient {
@@ -18,7 +17,8 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen motivation-gradient p-4">
+<!-- Added transition-all and duration-500 here for a smooth half-hourly color change -->
+<body class="flex items-center justify-center min-h-screen motivation-gradient p-4 transition-all duration-500 ease-in-out">
 
     <!-- Motivation Card -->
     <div id="motivation-card" class="bg-white/90 backdrop-blur-sm p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-xl text-center transition-all duration-500 transform scale-100 hover:scale-[1.02]">
@@ -27,7 +27,7 @@
             00:00:00
         </h1>
         <p class="text-indigo-500 text-sm md:text-base font-medium uppercase tracking-widest mb-6">
-            It's the start of your new hour.
+            A new half hour of opportunity begins now.
         </p>
         <blockquote class="text-3xl md:text-4xl font-light text-gray-800 italic leading-snug">
             <span id="quote-text">Loading inspiration...</span>
@@ -36,56 +36,80 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Use a self-contained array of 24 objects (one for each hour, 0-23)
-        const hourlyMessages = [
-            // Hour 0 (00:00 - 00:59) - Midnight
-            { hour: 0, time: "12:00 AM", message: "Deep rest is essential. Let go of the day and embrace the silence. Your energy bank is refueling.", color: "red" },
-            // Hour 1 (01:00)
-            { hour: 1, time: "1:00 AM", message: "Trust the night. Great ideas are often born in quiet contemplation, even in your dreams.", color: "red" },
-            // Hour 2 (02:00)
-            { hour: 2, time: "2:00 AM", message: "The world is on pause. This is the moment for healing and preparation for the rising sun.", color: "red" },
-            // Hour 3 (03:00)
-            { hour: 3, time: "3:00 AM", message: "Dream big. The canvas of your future is painted when the present moment is still.", color: "red" },
-            // Hour 4 (04:00)
-            { hour: 4, time: "4:00 AM", message: "The early hours hold silent potential. Even if you're asleep, your mind is processing success.", color: "orange" },
-            // Hour 5 (05:00)
-            { hour: 5, time: "5:00 AM", message: "Quiet preparation is the foundation of brilliant days. Plan your three main victories now.", color: "orange" },
-            // Hour 6 (06:00)
-            { hour: 6, time: "6:00 AM", message: "Sunrise: A fresh start button. Set the intention to be productive, patient, and present.", color: "green" },
-            // Hour 7 (07:00)
-            { hour: 7, time: "7:00 AM", message: "Structure your morning routine. A disciplined start leads to a powerful day. Focus on one task.", color: "green" },
-            // Hour 8 (08:00)
-            { hour: 8, time: "8:00 AM", message: "Tackle the 'Frog.' Do your hardest, most important task first. Momentum starts here.", color: "blue" },
-            // Hour 9 (09:00)
-            { hour: 9, time: "9:00 AM", message: "Momentum built. Maintain the pace by taking a structured, 5-minute movement break.", color: "blue" },
-            // Hour 10 (10:00)
-            { hour: 10, time: "10:00 AM", message: "Mid-morning focus is crucial. Eliminate distractions and dive deep into complexity.", color: "blue" },
-            // Hour 11 (11:00)
-            { hour: 11, time: "11:00 AM", message: "Time for a quick progress check. Are you moving the needle? Re-align if needed.", color: "yellow" },
-            // Hour 12 (12:00 - 12:59) - Noon
-            { hour: 12, time: "12:00 PM", message: "Lunchtime recharge. Step away from your desk. Give your mind a complete, non-work break.", color: "yellow" },
-            // Hour 13 (13:00)
-            { hour: 13, time: "1:00 PM", message: "The afternoon surge begins. Hydrate, stretch, and attack your second priority with fresh eyes.", color: "purple" },
-            // Hour 14 (14:00)
-            { hour: 14, time: "2:00 PM", message: "Power through the slump. If motivation dips, switch to a task requiring low cognitive load.", color: "purple" },
-            // Hour 15 (15:00)
-            { hour: 15, time: "3:00 PM", message: "This is your peak productivity window for collaboration or quick wins. Delegate or decide swiftly.", color: "purple" },
-            // Hour 16 (16:00)
-            { hour: 16, time: "4:00 PM", message: "Wrap-up mode. Finalize commitments and capture loose ends. Clear the slate for tomorrow.", color: "cyan" },
-            // Hour 17 (17:00)
-            { hour: 17, time: "5:00 PM", message: "Transition time. Mentally check out from work. Focus on the value you created today, not what's left.", color: "cyan" },
-            // Hour 18 (18:00)
-            { hour: 18, time: "6:00 PM", message: "Celebrate small wins. Acknowledging progress fuels future success. Be kind to yourself.", color: "pink" },
-            // Hour 19 (19:00)
-            { hour: 19, time: "7:00 PM", message: "Invest in connection. Spend quality time with people you love, or engage in a rewarding hobby.", color: "pink" },
-            // Hour 20 (20:00)
-            { hour: 20, time: "8:00 PM", message: "Learn something new. Read a chapter, watch a documentary, or practice a skill. Grow every day.", color: "pink" },
-            // Hour 21 (21:00)
-            { hour: 21, time: "9:00 PM", message: "Reflect and write. What went well? What could be improved? Gratitude is key.", color: "gray" },
-            // Hour 22 (22:00)
-            { hour: 22, time: "10:00 PM", message: "Wind down routine. Dim the lights, put the phone away. Prepare your body for restorative sleep.", color: "gray" },
-            // Hour 23 (23:00)
-            { hour: 23, time: "11:00 PM", message: "The day is done. Sleep is the most productive thing you can do now. Good night.", color: "gray" }
+        // Array of 48 objects (one for each 30-minute block, 0-47)
+        const messages30min = [
+            // Hour 0 (00:00 - 01:00) - Deep Night
+            { block: 0, message: "Deep rest is essential. Let go of the day and embrace the silence. Your energy bank is refueling.", color: "red" },
+            { block: 1, message: "Embrace the quiet. Mid-cycle healing is taking place. Let your subconscious do the work.", color: "red" },
+            // Hour 1 (01:00 - 02:00)
+            { block: 2, message: "Trust the night. Great ideas are often born in quiet contemplation, even in your dreams.", color: "red" },
+            { block: 3, message: "Let intuition guide you. The path forward is often clearest when the world is still.", color: "red" },
+            // Hour 2 (02:00 - 03:00)
+            { block: 4, message: "The world is on pause. This is the moment for healing and preparation for the rising sun.", color: "red" },
+            { block: 5, message: "Healing and preparation are key. The quiet hours build your resilience for tomorrow.", color: "red" },
+            // Hour 3 (03:00 - 04:00)
+            { block: 6, message: "Dream big. The canvas of your future is painted when the present moment is still.", color: "red" },
+            { block: 7, message: "Your future is being painted now. Visualize success and believe in the next sunrise.", color: "red" },
+            // Hour 4 (04:00 - 05:00) - Pre-Dawn
+            { block: 8, message: "The early hours hold silent potential. Even if you're asleep, your mind is processing success.", color: "orange" },
+            { block: 9, message: "Pre-dawn potential. Preparing to rise and seize the opportunities the new day brings.", color: "orange" },
+            // Hour 5 (05:00 - 06:00)
+            { block: 10, message: "Quiet preparation is the foundation of brilliant days. Plan your three main victories now.", color: "orange" },
+            { block: 11, message: "Set your three main victories. Focus your energy before the day demands your attention.", color: "orange" },
+            // Hour 6 (06:00 - 07:00) - Sunrise / Early Morning
+            { block: 12, message: "Sunrise: A fresh start button. Set the intention to be productive, patient, and present.", color: "green" },
+            { block: 13, message: "Intention for the day. Take a moment to breathe and anchor yourself in gratitude.", color: "green" },
+            // Hour 7 (07:00 - 08:00)
+            { block: 14, message: "Structure your morning routine. A disciplined start leads to a powerful day. Focus on one task.", color: "green" },
+            { block: 15, message: "Disciplined momentum. You're building speed; don't let small distractions derail your flow.", color: "green" },
+            // Hour 8 (08:00 - 09:00) - Morning Focus
+            { block: 16, message: "Tackle the 'Frog.' Do your hardest, most important task first. Momentum starts here.", color: "blue" },
+            { block: 17, message: "Deep focus now. Silence the noise and commit fully to the complex task at hand.", color: "blue" },
+            // Hour 9 (09:00 - 10:00)
+            { block: 18, message: "Momentum built. Maintain the pace by taking a structured, 5-minute movement break.", color: "blue" },
+            { block: 19, message: "Re-engage with energy. That short break was a powerful investment. Back to work!", color: "blue" },
+            // Hour 10 (10:00 - 11:00)
+            { block: 20, message: "Mid-morning focus is crucial. Eliminate distractions and dive deep into complexity.", color: "blue" },
+            { block: 21, message: "You are in the flow state. Protect this window. Depth over breadth.", color: "blue" },
+            // Hour 11 (11:00 - 12:00) - Pre-Lunch
+            { block: 22, message: "Time for a quick progress check. Are you moving the needle? Re-align if needed.", color: "yellow" },
+            { block: 23, message: "Final push before lunch. Finish one small item completely and step away clean.", color: "yellow" },
+            // Hour 12 (12:00 - 13:00) - Noon
+            { block: 24, message: "Lunchtime recharge. Step away from your desk. Give your mind a complete, non-work break.", color: "yellow" },
+            { block: 25, message: "Nourish your body and mind. A good second half starts with a great pause.", color: "yellow" },
+            // Hour 13 (13:00 - 14:00) - Afternoon Surge
+            { block: 26, message: "The afternoon surge begins. Hydrate, stretch, and attack your second priority with fresh eyes.", color: "purple" },
+            { block: 27, message: "Attack your second priority. Use this post-lunch energy wisely on high-impact work.", color: "purple" },
+            // Hour 14 (14:00 - 15:00)
+            { block: 28, message: "Power through the slump. If motivation dips, switch to a task requiring low cognitive load.", color: "purple" },
+            { block: 29, message: "If focus is low, switch gears. Tidy up or plan. Forward movement is always the goal.", color: "purple" },
+            // Hour 15 (15:00 - 16:00)
+            { block: 30, message: "This is your peak productivity window for collaboration or quick wins. Delegate or decide swiftly.", color: "purple" },
+            { block: 31, message: "Decide swiftly. Don't let indecision stall momentum. Commit and move on.", color: "purple" },
+            // Hour 16 (16:00 - 17:00) - Pre-Evening
+            { block: 32, message: "Wrap-up mode. Finalize commitments and capture loose ends. Clear the slate for tomorrow.", color: "cyan" },
+            { block: 33, message: "Capture loose ends. Dedicate 30 minutes to clean up before closing your primary tasks.", color: "cyan" },
+            // Hour 17 (17:00 - 18:00) - Evening Transition
+            { block: 34, message: "Transition time. Mentally check out from work. Focus on the value you created today, not what's left.", color: "cyan" },
+            { block: 35, message: "Focus on value created. End the day with a list of accomplishments, not just tasks remaining.", color: "cyan" },
+            // Hour 18 (18:00 - 19:00) - Early Evening
+            { block: 36, message: "Celebrate small wins. Acknowledging progress fuels future success. Be kind to yourself.", color: "pink" },
+            { block: 37, message: "Be kind to yourself. You navigated a day's worth of challenges. Rest is deserved.", color: "pink" },
+            // Hour 19 (19:00 - 20:00)
+            { block: 38, message: "Invest in connection. Spend quality time with people you love, or engage in a rewarding hobby.", color: "pink" },
+            { block: 39, message: "Connect and recharge. Meaningful relationships bring deep, lasting energy.", color: "pink" },
+            // Hour 20 (20:00 - 21:00)
+            { block: 40, message: "Learn something new. Read a chapter, watch a documentary, or practice a skill. Grow every day.", color: "pink" },
+            { block: 41, message: "Practice a skill. Consistent, small efforts lead to mastery over time.", color: "pink" },
+            // Hour 21 (21:00 - 22:00) - Wind Down
+            { block: 42, message: "Reflect and write. What went well? What could be improved? Gratitude is key.", color: "gray" },
+            { block: 43, message: "Gratitude is key. End your day by listing three things you are thankful for.", color: "gray" },
+            // Hour 22 (22:00 - 23:00)
+            { block: 44, message: "Wind down routine. Dim the lights, put the phone away. Prepare your body for restorative sleep.", color: "gray" },
+            { block: 45, message: "Prepare for restorative sleep. A quality night's rest is your most important productivity tool.", color: "gray" },
+            // Hour 23 (23:00 - 00:00)
+            { block: 46, message: "The day is done. Sleep is the most productive thing you can do now. Good night.", color: "gray" },
+            { block: 47, message: "Good night. Release all expectations until morning. You did enough today.", color: "gray" }
         ];
 
         const quoteText = document.getElementById('quote-text');
@@ -93,28 +117,82 @@
         const motivationCard = document.getElementById('motivation-card');
         const body = document.body;
         
-        // State to track the last hour displayed (initial value -1 ensures it updates immediately on load)
-        let lastLondonHour = -1; 
+        // State to track the last 30-minute block displayed (0 to 47)
+        let lastBlockIndex = -1; 
         const timeZone = "Europe/London";
+        let notificationPermission = 'default'; // Tracks the current permission status
 
         /**
-         * Updates the motivation message, clock display, and schedules the next update.
+         * Requests notification permission from the user on page load.
+         */
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                console.warn('Notifications not supported by this browser.');
+                return;
+            }
+            
+            notificationPermission = Notification.permission;
+            
+            if (notificationPermission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    notificationPermission = permission;
+                    if (permission === 'granted') {
+                        console.log("Notification permission granted.");
+                    } else if (permission === 'denied') {
+                        console.log("Notification permission denied by user.");
+                    }
+                });
+            }
+        }
+
+        /**
+         * Sends a notification with the motivational quote.
+         * @param {string} quote The motivational message.
+         */
+        function sendMotivationNotification(quote) {
+            // Check if permission is granted before trying to send
+            if (notificationPermission === 'granted') {
+                const title = "New 30-Minute Focus!";
+                // Note: The icon uses a placeholder URL as external file hosting is not supported.
+                new Notification(title, {
+                    body: quote,
+                    icon: 'https://placehold.co/64x64/2563eb/ffffff?text=Focus', 
+                    // Add vibration pattern for mobile devices (if supported)
+                    vibrate: [200, 100, 200] 
+                });
+            }
+        }
+
+        /**
+         * Updates the motivation message, clock display, and gradient every 30 minutes.
          */
         function updateMotivation() {
             const now = new Date();
 
-            // 1. Calculate current London hour (0-23) using Intl.DateTimeFormat
-            // This MUST stay in 24-hour format to correctly index the hourlyMessages array.
-            const currentHour = parseInt(now.toLocaleString("en-US", { 
+            // Use toLocaleString to get London time components for accurate calculation
+            const options24h = { 
                 timeZone: timeZone, 
                 hour: "numeric", 
-                hour12: false 
-            }), 10);
+                minute: "numeric",
+                hour12: false
+            };
+            const londonTimeStr = now.toLocaleString("en-US", options24h);
+            
+            // Extract hour and minute components in London time
+            // The split/map logic handles potential non-standard formats depending on locale/browser quirks
+            const timeParts = londonTimeStr.split(':').map(s => s.trim().split(' ')[0]);
+            const currentHour = parseInt(timeParts[0], 10);
+            const currentMinute = parseInt(timeParts[1], 10);
+
+            // 1. Calculate the current 30-minute block index (0 to 47)
+            const isSecondHalf = currentMinute >= 30 ? 1 : 0;
+            const currentBlockIndex = currentHour * 2 + isSecondHalf;
+
 
             // 2. Calculate display time in 12-hour format (e.g., "3:52:30 PM")
             const timeDisplayString = now.toLocaleTimeString('en-US', { 
                 timeZone: timeZone, 
-                hour: 'numeric', // Use 'numeric' for no leading zero on the hour (e.g., "3" not "03")
+                hour: 'numeric', 
                 minute: '2-digit', 
                 second: '2-digit', 
                 hour12: true 
@@ -124,14 +202,17 @@
             timeDisplay.textContent = timeDisplayString;
 
 
-            // 3. Only update the motivational content and styling if the hour has changed
-            if (currentHour !== lastLondonHour) {
-                console.log(`Hour changed to ${currentHour} in London. Updating content.`);
-                lastLondonHour = currentHour;
+            // 3. Only update the motivational content, styling, and send notification if the block has changed
+            if (currentBlockIndex !== lastBlockIndex) {
+                console.log(`30-Minute block changed to ${currentBlockIndex} in London. Updating content and sending notification.`);
+                lastBlockIndex = currentBlockIndex;
                 
-                if (currentHour >= 0 && currentHour < hourlyMessages.length) {
-                    const data = hourlyMessages[currentHour];
+                if (currentBlockIndex >= 0 && currentBlockIndex < messages30min.length) {
+                    const data = messages30min[currentBlockIndex];
 
+                    // --- NEW FEATURE: Send Notification ---
+                    sendMotivationNotification(data.message);
+                    
                     // Update text
                     quoteText.textContent = data.message;
                     
@@ -167,24 +248,26 @@
                     }
 
                     // Apply new gradient and time color, removing previous ones
-                    body.className = body.className.replace(/motivation-gradient|from-\w+-\d+ to-\w+-\d+/g, '').trim();
+                    body.className = body.className.replace(/motivation-gradient|from-\w+-\d+ to-\w+-\d+|bg-gradient-to-br/g, '').trim();
                     
-                    // Use the spread operator on gradientClass.split(' ') to pass individual tokens 
-                    // to classList.add, resolving the InvalidCharacterError.
-                    body.classList.add('flex', 'items-center', 'justify-center', 'min-h-screen', 'p-4', 'bg-gradient-to-br', ...gradientClass.split(' '));
+                    // Add body classes
+                    body.classList.add('flex', 'items-center', 'justify-center', 'min-h-screen', 'p-4', 'bg-gradient-to-br', 'transition-all', 'duration-500', 'ease-in-out', ...gradientClass.split(' '));
 
+                    // Add time display classes
                     timeDisplay.className = timeDisplay.className.replace(/text-\w+-\d+/g, '').trim();
                     timeDisplay.classList.add(timeColorClass, 'text-6xl', 'md:text-8xl', 'font-extrabold', 'mb-4', 'transition-colors', 'duration-500');
 
                 } else {
-                    quoteText.textContent = "Error: Invalid London hour detected.";
+                    quoteText.textContent = "Error: Invalid 30-minute block detected.";
                 }
             }
         }
 
-        // Initialize and start the application with a 1-second interval to keep the clock live 
-        // and ensure the content changes precisely when the London hour rolls over.
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. Request notification permission immediately
+            requestNotificationPermission(); 
+            
+            // 2. Start the clock and update loop
             updateMotivation();
             // Check every 1 second
             setInterval(updateMotivation, 1000); 
